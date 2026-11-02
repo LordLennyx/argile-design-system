@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Argile — design system et kit d'interface</title>
+<meta name="description" content="Argile, design system documenté : jetons de couleur, typographie, espacements, composants interactifs, thème personnalisable en direct, contrôle de contraste et export des jetons CSS et JSON.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23b4532a'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{--h:40;--c:.13;--r:10px;--d:1;
+ --acc:oklch(.56 var(--c) var(--h));--acc-h:oklch(.5 var(--c) var(--h));--acc-s:oklch(.95 calc(var(--c)*.25) var(--h));--acc-t:oklch(.42 var(--c) var(--h));
+ --bg:#faf9f7;--sf:#fff;--sf2:#f3f1ee;--ink:#1c1a17;--mute:#6b665f;--line:#e6e2dc;
+ --ok:#1f7a4d;--ok-s:#e3f3ea;--warn:#a15c07;--warn-s:#fcf0dc;--err:#b42318;--err-s:#fde8e6;--sh:0 1px 2px rgba(28,26,23,.06),0 4px 14px -6px rgba(28,26,23,.12)}
+:root[data-mode=dark]{--bg:#141311;--sf:#1c1b19;--sf2:#262421;--ink:#f1eee9;--mute:#a39d94;--line:#34312d;--acc-s:oklch(.3 calc(var(--c)*.5) var(--h));--acc-t:oklch(.82 var(--c) var(--h));--ok-s:#173525;--warn-s:#3a2a10;--err-s:#3e1714;--ok:#5cc28c;--warn:#e6a54a;--err:#f2867c;--sh:0 1px 2px rgba(0,0,0,.4),0 6px 18px -8px rgba(0,0,0,.6)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 14.5px/1.55 'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+code,.mono{font-family:'Geist Mono',monospace;font-size:12.5px}
+.app{display:grid;grid-template-columns:240px 1fr 290px;min-height:100vh}
+nav{border-right:1px solid var(--line);padding:20px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;margin:0 6px 4px}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--acc);display:grid;place-items:center}
+.logo i::after{content:'';width:10px;height:10px;border-radius:50%;background:#fff}
+.ver{margin:0 6px 18px;color:var(--mute);font-size:12px}
+nav h4{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:16px 6px 6px;font-weight:600}
+nav a{display:block;padding:6px 10px;border-radius:8px;color:inherit;text-decoration:none;font-size:13.5px}
+nav a:hover{background:var(--sf2)}nav a.on{background:var(--acc-s);color:var(--acc-t);font-weight:600}
+main{padding:34px 44px 80px;min-width:0;max-width:980px}
+section{padding-top:16px;margin-bottom:46px;scroll-margin-top:10px}
+h1{font-size:40px;line-height:1.08;letter-spacing:-.03em;font-weight:700}
+h2{font-size:24px;letter-spacing:-.02em;font-weight:650;margin-bottom:4px}
+.lead{color:var(--mute);font-size:16px;max-width:62ch;margin:10px 0 0}
+.sub{color:var(--mute);margin-bottom:18px;max-width:70ch}
+.demo{background:var(--sf);border:1px solid var(--line);border-radius:calc(var(--r) + 4px);overflow:hidden;margin-bottom:14px}
+.demo .stage{padding:calc(26px*var(--d)) 26px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.demo .code{border-top:1px solid var(--line);background:var(--sf2);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.demo .code code{flex:1;overflow:auto;white-space:nowrap;color:var(--mute)}
+.lbl{font-size:12px;color:var(--mute);width:100%;margin-bottom:-4px}
+/* composants */
+.b{--bh:calc(38px*var(--d));height:var(--bh);padding:0 16px;border-radius:var(--r);border:1px solid transparent;font-weight:550;display:inline-flex;align-items:center;gap:8px;transition:background .15s,box-shadow .15s,transform .1s;white-space:nowrap}
+.b:active{transform:translateY(1px)}
+.b:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.b-p{background:var(--acc);color:#fff}.b-p:hover{background:var(--acc-h)}
+.b-s{background:var(--sf);border-color:var(--line);box-shadow:var(--sh)}.b-s:hover{background:var(--sf2)}
+.b-g{background:none;color:var(--acc-t)}.b-g:hover{background:var(--acc-s)}
+.b-d{background:var(--err);color:#fff}
+.b-sm{--bh:calc(30px*var(--d));padding:0 11px;font-size:13px}.b-lg{--bh:calc(46px*var(--d));padding:0 22px;font-size:15.5px}
+.b[disabled]{opacity:.45;pointer-events:none}
+.b .sp{width:14px;height:14px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(1turn)}}
+.fld{display:grid;gap:5px;min-width:220px;flex:1}
+.fld label{font-size:13px;font-weight:550}
+.fld small{font-size:12px;color:var(--mute)}
+.in{height:calc(38px*var(--d));border:1px solid var(--line);background:var(--sf);border-radius:var(--r);padding:0 12px;outline:0;transition:border .15s,box-shadow .15s;width:100%}
+.in:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-s)}
+.in.bad{border-color:var(--err);box-shadow:0 0 0 3px var(--err-s)}
+.fld .er{color:var(--err)}
+select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b665f' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.chk{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.chk input{appearance:none;width:18px;height:18px;border:1.5px solid var(--line);border-radius:calc(var(--r)*.45);background:var(--sf);display:grid;place-items:center;transition:.15s;margin:0}
+.chk input:checked{background:var(--acc);border-color:var(--acc)}
+.chk input:checked::after{content:'';width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.chk input[type=radio]{border-radius:50%}.chk input[type=radio]:checked::after{width:7px;height:7px;border:0;background:#fff;border-radius:50%;transform:none}
+.sw{width:38px;height:22px;border-radius:99px;background:var(--line);position:relative;border:0;transition:background .2s;flex:none}
+.sw::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.sw[aria-checked=true]{background:var(--acc)}.sw[aria-checked=true]::after{transform:translateX(16px)}
+.bdg{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--sf2);color:var(--mute)}
+.bdg i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.bdg.a{background:var(--acc-s);color:var(--acc-t)}.bdg.ok{background:var(--ok-s);color:var(--ok)}.bdg.w{background:var(--warn-s);color:var(--warn)}.bdg.e{background:var(--err-s);color:var(--err)}
+.al{display:flex;gap:12px;padding:12px 14px;border-radius:var(--r);border:1px solid;width:100%;align-items:flex-start}
+.al svg{flex:none;margin-top:2px}.al b{display:block;font-weight:600}.al p{color:var(--mute);font-size:13.5px}
+.al.ok{background:var(--ok-s);border-color:color-mix(in srgb,var(--ok) 30%,transparent);color:var(--ok)}
+.al.w{background:var(--warn-s);border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--warn)}
+.al.e{background:var(--err-s);border-color:color-mix(in srgb,var(--err) 30%,transparent);color:var(--err)}
+.al b+p{color:var(--ink);opacity:.8}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);width:100%;position:relative}
+.tabs button{border:0;background:none;padding:9px 14px;color:var(--mute);font-weight:550}
+.tabs button.on{color:var(--ink)}
+.tabs .ink{position:absolute;bottom:-1px;height:2px;background:var(--acc);transition:left .25s,width .25s}
+.tp{padding:14px 2px 0;color:var(--mute);width:100%}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:13px;color:#fff;border:2px solid var(--sf)}
+.avg{display:flex}.avg .av{margin-left:-9px}.avg .av:first-child{margin:0}
+.prog{width:100%;height:8px;border-radius:99px;background:var(--sf2);overflow:hidden}
+.prog div{height:100%;background:var(--acc);border-radius:99px;transition:width .6s}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:12px;color:var(--mute);font-weight:550;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.tbl td{padding:calc(10px*var(--d)) 12px;border-bottom:1px solid var(--line)}
+.tbl tr:hover td{background:var(--sf2)}
+.card{border:1px solid var(--line);border-radius:calc(var(--r) + 4px);background:var(--sf);box-shadow:var(--sh);padding:18px;width:260px}
+.card h5{font-size:15px;margin:10px 0 2px}.card p{color:var(--mute);font-size:13px}
+.ttp{position:relative}
+.ttp::after{content:attr(data-t);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,4px);background:var(--ink);color:var(--bg);font-size:12px;padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:.15s}
+.ttp:hover::after,.ttp:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+.ovl{position:fixed;inset:0;background:rgba(20,19,17,.45);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;padding:16px}
+.ovl.on{opacity:1;pointer-events:auto}
+.mdl{background:var(--sf);border-radius:calc(var(--r) + 6px);width:420px;max-width:100%;padding:22px;box-shadow:0 24px 60px -20px rgba(0,0,0,.4);transform:translateY(10px) scale(.98);transition:transform .2s}
+.ovl.on .mdl{transform:none}
+.mdl h3{font-size:18px}.mdl p{color:var(--mute);margin:6px 0 18px}
+.mdl .act{display:flex;gap:8px;justify-content:flex-end}
+.toasts{position:fixed;right:18px;bottom:18px;display:grid;gap:8px;z-index:50}
+.tst{background:var(--ink);color:var(--bg);padding:11px 14px;border-radius:var(--r);box-shadow:var(--sh);display:flex;gap:10px;align-items:center;animation:tin .25s;font-size:13.5px;min-width:260px}
+.tst button{margin-left:auto;background:none;border:0;color:inherit;opacity:.7;font-weight:600}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+/* jetons */
+.ramp{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;width:100%}
+.ramp div{height:64px;border-radius:calc(var(--r)*.7);position:relative;cursor:pointer;transition:transform .15s}
+.ramp div:hover{transform:translateY(-2px)}
+.ramp span{position:absolute;left:7px;bottom:5px;font:500 10.5px 'Geist Mono'}
+.tok{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+.tok>div{border:1px solid var(--line);border-radius:var(--r);padding:10px;font-size:12.5px}
+.tok i{display:block;height:38px;border-radius:calc(var(--r)*.6);margin-bottom:8px;border:1px solid var(--line)}
+.tok code{color:var(--mute);font-size:11.5px}
+.ty{width:100%}.ty div{display:grid;grid-template-columns:110px 1fr;align-items:baseline;gap:16px;padding:9px 0;border-bottom:1px solid var(--line)}
+.ty code{color:var(--mute)}
+.spc{display:grid;gap:7px;width:100%}.spc div{display:grid;grid-template-columns:70px 1fr;align-items:center;font-size:12.5px}.spc i{height:12px;background:var(--acc-s);border:1px solid var(--acc);border-radius:3px}
+.ctr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.ctr>div{border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;gap:10px;align-items:center}
+.ctr .sw2{width:44px;height:44px;border-radius:8px;display:grid;place-items:center;font-weight:700;flex:none}
+.ctr b{font-family:'Geist Mono';font-size:13px}
+/* panneau thème */
+.pn{border-left:1px solid var(--line);padding:22px 20px;position:sticky;top:0;height:100vh;overflow:auto;background:var(--sf)}
+.pn h3{font-size:14px;margin-bottom:2px}.pn>p{color:var(--mute);font-size:12.5px;margin-bottom:14px}
+.pn .row{margin-bottom:16px}.pn label{font-size:12.5px;font-weight:550;display:flex;justify-content:space-between;margin-bottom:6px}
+.pn label span{color:var(--mute);font-family:'Geist Mono';font-weight:400}
+.hues{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.hues button{aspect-ratio:1;border-radius:50%;border:2px solid var(--sf);box-shadow:0 0 0 1px var(--line)}
+.hues button.on{box-shadow:0 0 0 2px var(--ink)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.seg{display:flex;background:var(--sf2);border-radius:var(--r);padding:3px}
+.seg button{flex:1;border:0;background:none;padding:6px;border-radius:calc(var(--r) - 3px);font-size:13px;color:var(--mute);font-weight:550}
+.seg button.on{background:var(--sf);color:var(--ink);box-shadow:var(--sh)}
+pre{background:var(--sf2);border-radius:var(--r);padding:12px;font:11.5px/1.6 'Geist Mono';overflow:auto;max-height:220px;color:var(--mute);margin:8px 0}
+.mnu{display:none}
+@media (max-width:1180px){.app{grid-template-columns:220px 1fr}.pn{grid-column:1/-1;position:static;height:auto;border-left:0;border-top:1px solid var(--line)}}
+@media (max-width:760px){.app{grid-template-columns:1fr}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:12px 16px}nav .ver,nav h4,nav a{display:none}.logo{margin:0}main{padding:24px 16px 50px}h1{font-size:30px}.ramp{grid-template-columns:repeat(5,1fr)}.tok,.ctr{grid-template-columns:1fr 1fr}.card{width:100%}.demo .stage{padding:18px 16px}.tbl th:nth-child(3),.tbl td:nth-child(3){display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav id="nav"><div class="logo"><i></i>Argile</div><div class="ver">Design system · v2.4</div>
+<h4>Fondations</h4><a href="#intro" class="on">Introduction</a><a href="#couleurs">Couleurs</a><a href="#typo">Typographie</a><a href="#espaces">Espacements et rayons</a><a href="#contraste">Contraste</a>
+<h4>Composants</h4><a href="#boutons">Boutons</a><a href="#champs">Champs de formulaire</a><a href="#choix">Cases, radios, interrupteurs</a><a href="#badges">Badges et alertes</a><a href="#onglets">Onglets</a><a href="#donnees">Tableau de données</a><a href="#cartes">Cartes et avatars</a><a href="#retours">Fenêtres et notifications</a></nav>
+<main>
+<section id="intro"><span class="bdg a">Version 2.4 · novembre 2026</span><h1 style="margin-top:14px">Un langage commun<br>pour toutes nos interfaces.</h1><p class="lead">Argile rassemble les jetons, les composants et les règles qui font l'identité de nos produits. Réglez le thème dans le panneau de droite : chaque composant de cette page se met à jour, et les jetons s'exportent en CSS ou en JSON.</p></section>
+<section id="couleurs"><h2>Couleurs</h2><p class="sub">Une rampe de dix teintes générée en OKLCH à partir de la couleur d'accent, plus des couleurs sémantiques fixes. Cliquez sur une teinte pour copier sa valeur.</p>
+<div class="demo"><div class="stage"><div class="lbl">Accent</div><div class="ramp" id="ramp"></div><div class="lbl" style="margin-top:8px">Sémantique et surfaces</div><div class="tok" id="tok"></div></div></div></section>
+<section id="typo"><h2>Typographie</h2><p class="sub">Geist pour l'interface, Geist Mono pour les données et le code. Une échelle à ratio 1,25.</p>
+<div class="demo"><div class="stage"><div class="ty"><div><code>display · 40</code><span style="font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Payez en un geste</span></div><div><code>titre · 24</code><span style="font-size:24px;font-weight:650;letter-spacing:-.02em">Résumé de la commande</span></div><div><code>sous-titre · 18</code><span style="font-size:18px;font-weight:600">Adresse de livraison</span></div><div><code>corps · 14,5</code><span>Votre colis arrive jeudi entre 10 h et 12 h à Bonapriso.</span></div><div><code>légende · 12</code><span style="font-size:12px;color:var(--mute)">Mis à jour il y a 3 minutes</span></div><div><code>mono · 13</code><span class="mono" style="font-size:13px">TXN-2026-11-0042 · 18 500 FCFA</span></div></div></div></div></section>
+<section id="espaces"><h2>Espacements et rayons</h2><p class="sub">Une grille de 4 px. Le rayon et la densité se règlent globalement depuis le panneau de thème.</p>
+<div class="demo"><div class="stage"><div class="spc" id="spc"></div></div></div></section>
+<section id="contraste"><h2>Contraste</h2><p class="sub">Calculé en direct selon WCAG 2.2 pour les couples texte et fond du thème courant. Le seuil AA est de 4,5:1 pour le texte courant.</p>
+<div class="demo"><div class="stage"><div class="ctr" id="ctr"></div></div></div></section>
+<section id="boutons"><h2>Boutons</h2><p class="sub">Quatre variantes, trois tailles, états désactivé et chargement. Un seul bouton principal par vue.</p>
+<div class="demo"><div class="stage"><button class="b b-p" id="bload">Valider le paiement</button><button class="b b-s">Annuler</button><button class="b b-g">En savoir plus</button><button class="b b-d">Supprimer</button><div class="lbl">Tailles et états</div><button class="b b-p b-sm">Petit</button><button class="b b-p">Moyen</button><button class="b b-p b-lg">Grand</button><button class="b b-s" disabled>Désactivé</button><button class="b b-s ttp" data-t="Raccourci : Ctrl + S"><svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 2h8l3 3v9H2V2z M5 2v4h6V2M5 14V9h6v5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>Avec icône et info-bulle</button></div><div class="code"><code>&lt;button class="b b-p"&gt;Valider le paiement&lt;/button&gt;</code><button class="b b-g b-sm cp">Copier</button></div></div></section>
+<section id="champs"><h2>Champs de formulaire</h2><p class="sub">Libellé toujours visible, aide sous le champ, erreur annoncée en texte et pas seulement en couleur.</p>
+<div class="demo"><div class="stage"><div class="fld"><label for="f1">Nom complet</label><input class="in" id="f1" value="Aïcha Bello"><small>Tel qu'il figure sur la pièce d'identité</small></div><div class="fld"><label for="f2">Téléphone Mobile Money</label><input class="in" id="f2" placeholder="6 XX XX XX XX" inputmode="tel"><small id="f2m">9 chiffres, commence par 6</small></div><div class="fld"><label for="f3">Ville</label><select class="in" id="f3"><option>Douala</option><option>Yaoundé</option><option>Bafoussam</option><option>Garoua</option></select><small>Pour estimer les délais</small></div></div><div class="code"><code>&lt;input class="in" aria-describedby="aide"&gt;</code><button class="b b-g b-sm cp">Copier</button></div></div></section>
+<section id="choix"><h2>Cases, radios, interrupteurs</h2><p class="sub">Zone cliquable étendue au libellé, focus visible au clavier.</p>
+<div class="demo"><div class="stage" style="gap:22px"><label class="chk"><input type="checkbox" checked>Recevoir le reçu par SMS</label><label class="chk"><input type="checkbox">Enregistrer cette carte</label><label class="chk"><input type="radio" name="r" checked>Livraison</label><label class="chk"><input type="radio" name="r">Retrait en boutique</label><span class="chk"><button class="sw" role="switch" aria-checked="true" aria-label="Notifications"></button>Notifications</span><span class="chk"><button class="sw" role="switch" aria-checked="false" aria-label="Mode hors ligne"></button>Mode hors ligne</span></div></div></section>
+<section id="badges"><h2>Badges et alertes</h2><p class="sub">Les couleurs sémantiques sont réservées aux états et toujours accompagnées d'un libellé.</p>
+<div class="demo"><div class="stage"><span class="bdg">Brouillon</span><span class="bdg a"><i></i>Nouveau</span><span class="bdg ok"><i></i>Payée</span><span class="bdg w"><i></i>En attente</span><span class="bdg e"><i></i>Échouée</span>
+<div class="al ok"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="currentColor"/><path d="M5.5 9.2l2.3 2.3 4.7-4.8" stroke="#fff" stroke-width="1.8" fill="none"/></svg><div><b>Paiement reçu</b><p>18 500 FCFA crédités sur le compte de la boutique.</p></div></div>
+<div class="al w"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l8 14H1z" fill="currentColor"/><path d="M9 7v3.5M9 12.5v.5" stroke="#fff" stroke-width="1.8"/></svg><div><b>Solde bientôt insuffisant</b><p>Il reste 2 300 FCFA, rechargez avant vendredi.</p></div></div>
+<div class="al e"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="currentColor"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" stroke-width="1.8"/></svg><div><b>Transaction refusée</b><p>Le code de confirmation a expiré. Relancez le paiement.</p></div></div></div></div></section>
+<section id="onglets"><h2>Onglets</h2><p class="sub">Indicateur animé, navigation aux flèches du clavier.</p>
+<div class="demo"><div class="stage" style="display:block"><div class="tabs" id="tabs" role="tablist"><button class="on" role="tab">Aperçu</button><button role="tab">Transactions</button><button role="tab">Paramètres</button><button role="tab">Équipe</button><i class="ink"></i></div><div class="tp" id="tp"></div></div></div></section>
+<section id="donnees"><h2>Tableau de données</h2><p class="sub">Tri par colonne, chiffres alignés à droite en police mono, statut en badge.</p>
+<div class="demo"><div class="stage" style="display:block;padding:8px 10px"><table class="tbl" id="tbl"></table></div></div></section>
+<section id="cartes"><h2>Cartes et avatars</h2><p class="sub">Les cartes portent l'ombre du thème ; la barre de progression suit l'accent.</p>
+<div class="demo"><div class="stage"><div class="card"><div class="avg"><span class="av" style="background:#b4532a">AB</span><span class="av" style="background:#2b6cb0">JM</span><span class="av" style="background:#2f855a">EN</span><span class="av" style="background:var(--sf2);color:var(--mute)">+4</span></div><h5>Refonte de l'application</h5><p>7 personnes · échéance le 12 décembre</p><div class="prog" style="margin:14px 0 6px"><div id="pg" style="width:64%"></div></div><p class="mono">64 % terminé</p></div>
+<div class="card"><span class="bdg ok"><i></i>Actif</span><h5>Forfait Boutique</h5><p>Paiements illimités, 3 caisses, tableau de bord.</p><p style="margin:12px 0;color:var(--ink);font-size:24px;font-weight:700;letter-spacing:-.02em">9 900 <small style="font-size:13px;color:var(--mute);font-weight:500">FCFA / mois</small></p><button class="b b-s b-sm" style="width:100%;justify-content:center">Gérer le forfait</button></div></div></div></section>
+<section id="retours"><h2>Fenêtres et notifications</h2><p class="sub">Fenêtre modale avec piège du focus et fermeture à Échap, notifications empilées avec action d'annulation.</p>
+<div class="demo"><div class="stage"><button class="b b-s" id="omdl">Ouvrir la fenêtre</button><button class="b b-s" id="otst">Afficher une notification</button></div></div></section>
+</main>
+<aside class="pn" id="pn"><h3>Thème</h3><p>Tout le système se régénère à partir de ces réglages.</p>
+<div class="row"><label>Couleur d'accent <span id="hv"></span></label><div class="hues" id="hues"></div></div>
+<div class="row"><label>Saturation <span id="cv"></span></label><input type="range" id="cr" min=".04" max=".2" step=".01"></div>
+<div class="row"><label>Rayon des angles <span id="rv"></span></label><input type="range" id="rr" min="0" max="20" step="1"></div>
+<div class="row"><label>Densité</label><div class="seg" id="dens"><button data-d=".85">Compacte</button><button data-d="1" class="on">Normale</button><button data-d="1.15">Aérée</button></div></div>
+<div class="row"><label>Mode</label><div class="seg" id="mode"><button data-m="light" class="on">Clair</button><button data-m="dark">Sombre</button></div></div>
+<div class="row"><label>Exporter les jetons</label><div class="seg" id="fmt"><button data-f="css" class="on">CSS</button><button data-f="json">JSON</button></div><pre id="out"></pre><button class="b b-p b-sm" id="cpo" style="width:100%;justify-content:center">Copier les jetons</button></div></aside>
+</div>
+<div class="ovl" id="ovl"><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="mt"><h3 id="mt">Supprimer la carte enregistrée ?</h3><p>La carte se terminant par 4821 ne pourra plus être utilisée pour les paiements rapides. Cette action est définitive.</p><div class="act"><button class="b b-s" id="mno">Annuler</button><button class="b b-d" id="myes">Supprimer</button></div></div></div>
+<div class="toasts" id="toasts"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const R=document.documentElement;
+const T={h:40,c:.13,r:10,d:1,m:'light',f:'css'};
+const HUES=[[40,'Terre'],[75,'Ocre'],[150,'Forêt'],[200,'Lagune'],[265,'Indigo'],[355,'Bissap']];
+// conversion OKLCH vers sRGB pour afficher les valeurs hexadécimales
+function oklch(L,C,H){const h=H*Math.PI/180,a=C*Math.cos(h),b=C*Math.sin(h);const l=(L+.3963377774*a+.2158037573*b)**3,m=(L-.1055613458*a-.0638541728*b)**3,s=(L-.0894841775*a-1.291485548*b)**3;
+ let r=4.0767416621*l-3.3077115913*m+.2309699292*s,g=-1.2684380046*l+2.6097574011*m-.3413193965*s,bl=-.0041960863*l-.7034186147*m+1.707614701*s;
+ const f=x=>{x=Math.max(0,Math.min(1,x));return Math.round(255*(x<=.0031308?12.92*x:1.055*x**(1/2.4)-.055))};return '#'+[r,g,bl].map(f).map(v=>v.toString(16).padStart(2,'0')).join('')}
+function lum(hex){const v=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]}
+const ratio=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const STEPS=[[50,.97],[100,.93],[200,.86],[300,.77],[400,.67],[500,.56],[600,.5],[700,.42],[800,.34],[900,.26]];
+const rampOf=()=>STEPS.map(([n,L])=>[n,oklch(L,T.c*(L>.9?.3:L>.8?.6:1),T.h)]);
+function toast(m,undo){const t=document.createElement('div');t.className='tst';t.innerHTML=`<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="var(--ok)"/><path d="M5 8.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>${m}${undo?'<button>Annuler</button>':''}`;$('#toasts').append(t);setTimeout(()=>t.remove(),3200);const b=t.querySelector('button');if(b)b.onclick=()=>{t.remove();toast('Action annulée')}}
+const copy=s=>{try{navigator.clipboard.writeText(s)}catch(e){}};
+function apply(){R.style.setProperty('--h',T.h);R.style.setProperty('--c',T.c);R.style.setProperty('--r',T.r+'px');R.style.setProperty('--d',T.d);R.dataset.mode=T.m;
+ $('#hv').textContent=(HUES.find(x=>x[0]===T.h)||[0,T.h+'°'])[1];$('#cv').textContent=T.c.toFixed(2);$('#rv').textContent=T.r+' px';$('#cr').value=T.c;$('#rr').value=T.r;
+ $$('#hues button').forEach(b=>b.classList.toggle('on',+b.dataset.h===T.h));$$('#dens button').forEach(b=>b.classList.toggle('on',+b.dataset.d===T.d));$$('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===T.m));$$('#fmt button').forEach(b=>b.classList.toggle('on',b.dataset.f===T.f));
+ const rp=rampOf();$('#ramp').innerHTML=rp.map(([n,c])=>`<div style="background:${c}" data-c="${c}" title="Copier ${c}"><span style="color:${lum(c)>.4?'#1c1a17':'#fff'}">${n}<br>${c}</span></div>`).join('');
+ const cs=getComputedStyle(R),g=v=>cs.getPropertyValue(v).trim();
+ const toks=[['Accent','--acc',rp[5][1]],['Succès','--ok',g('--ok')],['Attention','--warn',g('--warn')],['Erreur','--err',g('--err')],['Fond','--bg',g('--bg')],['Surface','--sf',g('--sf')],['Texte','--ink',g('--ink')],['Texte secondaire','--mute',g('--mute')]];
+ $('#tok').innerHTML=toks.map(([n,v,c])=>`<div><i style="background:${c}"></i><b>${n}</b><br><code>${v} · ${c}</code></div>`).join('');
+ $('#spc').innerHTML=[4,8,12,16,24,32,48,64].map((s,i)=>`<div><code>space-${i+1}</code><i style="width:${s*3}px"></i></div>`).join('')+`<div style="margin-top:8px"><code>rayon</code><span style="display:flex;gap:10px">${[.5,1,1.6].map(k=>`<i style="width:54px;height:36px;border-radius:${Math.round(T.r*k)}px;background:var(--acc-s)"></i>`).join('')}</span></div>`;
+ const pairs=[['Texte',g('--ink'),g('--bg')],['Secondaire',g('--mute'),g('--bg')],['Bouton principal','#ffffff',rp[5][1]],['Lien sur surface',T.m==='dark'?rp[2][1]:rp[7][1],g('--sf')],['Accent clair',T.m==='dark'?rp[2][1]:rp[7][1],T.m==='dark'?oklch(.3,T.c*.5,T.h):rp[0][1]],['Erreur',g('--err'),g('--sf')]];
+ $('#ctr').innerHTML=pairs.map(([n,f,b])=>{const r=ratio(f,b);const lv=r>=7?'AAA':r>=4.5?'AA':r>=3?'AA grand':'Échec';return `<div><span class="sw2" style="color:${f};background:${b};border:1px solid var(--line)">Aa</span><span><b>${r.toFixed(2)}:1</b><br><span class="bdg ${r>=4.5?'ok':r>=3?'w':'e'}" style="margin-top:3px">${lv}</span> <small style="color:var(--mute)">${n}</small></span></div>`}).join('');
+ const vars={'color-accent':rp[5][1],'color-accent-hover':rp[6][1],'color-accent-subtle':rp[0][1],...Object.fromEntries(rp.map(([n,c])=>['accent-'+n,c])),'color-success':g('--ok'),'color-warning':g('--warn'),'color-danger':g('--err'),'color-bg':g('--bg'),'color-surface':g('--sf'),'color-text':g('--ink'),'radius':T.r+'px','density':T.d,'font-sans':'Geist, system-ui','font-mono':'Geist Mono, monospace'};
+ $('#out').textContent=T.f==='css'?':root {\n'+Object.entries(vars).map(([k,v])=>`  --${k}: ${v};`).join('\n')+'\n}':JSON.stringify({argile:{version:'2.4',mode:T.m,tokens:vars}},null,2);
+ moveInk()}
+$('#hues').innerHTML=HUES.map(([h,n])=>`<button data-h="${h}" title="${n}" style="background:${oklch(.56,.14,h)}"></button>`).join('');
+$('#hues').onclick=e=>{const b=e.target.closest('button');if(b){T.h=+b.dataset.h;apply()}};
+$('#cr').oninput=e=>{T.c=+e.target.value;apply()};$('#rr').oninput=e=>{T.r=+e.target.value;apply()};
+$('#dens').onclick=e=>{const b=e.target.closest('button');if(b){T.d=+b.dataset.d;apply()}};
+$('#mode').onclick=e=>{const b=e.target.closest('button');if(b){T.m=b.dataset.m;apply()}};
+$('#fmt').onclick=e=>{const b=e.target.closest('button');if(b){T.f=b.dataset.f;apply()}};
+$('#cpo').onclick=()=>{copy($('#out').textContent);toast('Jetons copiés au format '+T.f.toUpperCase())};
+$('#ramp').onclick=e=>{const d=e.target.closest('[data-c]');if(d){copy(d.dataset.c);toast('Couleur '+d.dataset.c+' copiée')}};
+$$('.cp').forEach(b=>b.onclick=()=>{copy(b.previousElementSibling.textContent);toast('Extrait copié')});
+// composants interactifs
+$('#bload').onclick=e=>{const b=e.currentTarget;if(b.dataset.l)return;b.dataset.l=1;const t=b.innerHTML;b.innerHTML='<i class="sp"></i>Traitement…';setTimeout(()=>{b.innerHTML=t;delete b.dataset.l;toast('Paiement de 18 500 FCFA validé')},1400)};
+$('#f2').oninput=e=>{const v=e.target.value.replace(/\D/g,''),ok=/^6\d{8}$/.test(v);e.target.classList.toggle('bad',v.length>=3&&!ok&&(v.length>=9||v[0]!=='6'));const m=$('#f2m');if(e.target.classList.contains('bad')){m.textContent='Numéro invalide : 9 chiffres commençant par 6';m.className='er'}else{m.textContent=ok?'Numéro valide':'9 chiffres, commence par 6';m.className=''}};
+$$('.sw').forEach(s=>s.onclick=()=>s.setAttribute('aria-checked',s.getAttribute('aria-checked')!=='true'));
+const TP=['Solde disponible : 248 300 FCFA. Trois paiements en attente de confirmation.','47 transactions ce mois-ci, dont 41 par Mobile Money et 6 par carte.','Notifications, devise, langue de l\'interface et clés de l\'API marchand.','Aïcha (propriétaire), Joël et Esther (caissiers), Nadège (comptable).'];
+function moveInk(){const b=$('#tabs .on'),i=$('#tabs .ink');if(b){i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px'}}
+function setTab(n){const bs=$$('#tabs button');bs.forEach((b,i)=>{b.classList.toggle('on',i===n);b.setAttribute('aria-selected',i===n)});$('#tp').textContent=TP[n];moveInk()}
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)setTab($$('#tabs button').indexOf(b))};
+$('#tabs').onkeydown=e=>{const i=$$('#tabs button').findIndex(b=>b.classList.contains('on'));if(e.key==='ArrowRight'){setTab((i+1)%4);$('#tabs .on').focus()}if(e.key==='ArrowLeft'){setTab((i+3)%4);$('#tabs .on').focus()}};
+let rows=[['TXN-0042','Aïcha Bello','Mobile Money',18500,'Payée'],['TXN-0041','Joël Mbarga','Carte',42000,'En attente'],['TXN-0040','Esther Nkolo','Mobile Money',7300,'Payée'],['TXN-0039','Paul Fotso','Mobile Money',125000,'Échouée'],['TXN-0038','Nadège Ewane','Carte',9900,'Payée']],sk=0,sd=-1;
+const B={'Payée':'ok','En attente':'w','Échouée':'e'};
+function tbl(){const h=['Référence','Client','Moyen','Montant','Statut'];$('#tbl').innerHTML='<thead><tr>'+h.map((x,i)=>`<th data-i="${i}" style="${i===3?'text-align:right':''}">${x}${sk===i?(sd>0?' ↑':' ↓'):''}</th>`).join('')+'</tr></thead><tbody>'+rows.map(r=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="mono" style="text-align:right">${r[3].toLocaleString('fr-FR')}</td><td><span class="bdg ${B[r[4]]}"><i></i>${r[4]}</span></td></tr>`).join('')+'</tbody>'}
+$('#tbl').onclick=e=>{const th=e.target.closest('th');if(!th)return;const i=+th.dataset.i;sd=sk===i?-sd:1;sk=i;rows.sort((a,b)=>(a[i]>b[i]?1:-1)*sd);tbl()};
+const ov=$('#ovl');let lastF;
+function openM(){lastF=document.activeElement;ov.classList.add('on');setTimeout(()=>$('#mno').focus(),50)}
+function closeM(){ov.classList.remove('on');lastF&&lastF.focus()}
+$('#omdl').onclick=openM;$('#mno').onclick=closeM;$('#myes').onclick=()=>{closeM();toast('Carte supprimée',true)};ov.onclick=e=>{if(e.target===ov)closeM()};
+addEventListener('keydown',e=>{if(!ov.classList.contains('on'))return;if(e.key==='Escape')closeM();if(e.key==='Tab'){const f=[$('#mno'),$('#myes')],i=f.indexOf(document.activeElement);e.preventDefault();f[(i+(e.shiftKey?1:1))%2].focus()}});
+$('#otst').onclick=()=>toast('Fichier exporté : transactions-novembre.csv',true);
+// navigation active au défilement
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)$$('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+en.target.id))}),{rootMargin:'-40% 0px -55% 0px'});$$('main section').forEach(s=>io.observe(s));
+window.__theme=o=>{Object.assign(T,o);apply()};window.__modal=openM;window.__toast=()=>$('#otst').click();window.__tab=setTab;
+setTab(0);tbl();apply();addEventListener('resize',moveInk);document.fonts&&document.fonts.ready.then(moveInk);
+</script>
+</body>
+</html>

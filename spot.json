@@ -1,0 +1,25 @@
+{
+ "titre": "<em>Argile</em>, design system",
+ "type": "Design system · kit d'interface documenté",
+ "sous_titre": "Jetons OKLCH, typographie, composants accessibles, thème en direct, contraste WCAG, export CSS et JSON",
+ "couleur": "#b4532a",
+ "graine": 35,
+ "voix": [
+  [3.3, "Argile, un design system complet et documenté,"],
+  [8.2, "la couleur, le rayon, la densité et le mode sombre se règlent, et tout le kit suit,"],
+  [16.2, "avec le contraste vérifié en direct et les jetons prêts à exporter."]
+ ],
+ "etapes": [
+  {"t": "wait", "ms": 1600},
+  {"t": "eval", "js": "document.getElementById('couleurs').scrollIntoView({behavior:'smooth'})", "pause": 1300},
+  {"t": "eval", "js": "window.__theme({h:200})", "pause": 1300},
+  {"t": "eval", "js": "window.__theme({h:265,r:16})", "pause": 1300},
+  {"t": "eval", "js": "document.getElementById('contraste').scrollIntoView({behavior:'smooth'})", "pause": 1500},
+  {"t": "eval", "js": "window.__theme({m:'dark'})", "pause": 1800},
+  {"t": "eval", "js": "document.getElementById('boutons').scrollIntoView({behavior:'smooth'})", "pause": 1500},
+  {"t": "eval", "js": "window.__theme({h:150,r:4,d:.85})", "pause": 1600},
+  {"t": "eval", "js": "document.getElementById('donnees').scrollIntoView({behavior:'smooth'})", "pause": 1500},
+  {"t": "eval", "js": "window.__theme({m:'light',h:40,r:10,d:1});window.__modal()", "pause": 2200},
+  {"t": "eval", "js": "document.getElementById('myes').click()", "pause": 1600}
+ ]
+}
